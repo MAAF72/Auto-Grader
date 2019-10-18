@@ -1,0 +1,4 @@
+Case 1 : Tidak
+Case 2 : Muat
+Case 3 : Muat
+Case 4 : Tidak

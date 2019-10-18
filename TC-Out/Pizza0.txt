@@ -1,0 +1,3 @@
+Case 1 : Muat
+Case 2 : Tidak
+Case 3 : Muat
