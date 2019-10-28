@@ -1,0 +1,3 @@
+Case 1 : Tolak
+Case 2 : Terima
+Case 3 : Terima

@@ -1,0 +1,46 @@
+{% extends 'apps/base.html' %}
+
+{% block content %}
+<h2>Submission Details</h2>
+<table id="submission" class="table table-hover">
+	<thead>
+		<tr>
+			<th scope="col">Info</th>
+			<th scope="col">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>User</td>
+			<td>{{ Submission.user.username }}</td>
+		</tr>
+		<tr>
+			<td>Problem</td>
+			<td>{{ Submission.problem }}</td>
+		</tr>
+		<tr>
+			<td>Language</td>
+			<td>{{ Submission.language }}</td>
+		</tr>
+		<tr>
+			<td>Status</td>
+			<td>{{ Submission.get_status_display }}</td>
+		</tr>
+		<tr>
+			<td>Score</td>
+			<td>{{ Submission.score }}</td>
+		</tr>
+		<tr>
+			<td>Date</td>
+			<td>{{ Submission.date|date:'j F Y, H:i:s' }}</td>
+		</tr>
+		<tr>
+			<td>Code</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+<div class="bg-light pt-3 pl-3 pr-3 mb-4 rounded border">
+	<pre>{{ Submission.code }}</pre>
+</div>
+{% endblock content %}

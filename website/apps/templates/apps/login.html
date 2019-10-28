@@ -1,0 +1,33 @@
+{% extends 'apps/base_auth.html' %}
+
+{% block content %}
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div class="form-login p-4 shadow bg-white mt-5">
+    <h3 class="text-center">Login</h3>
+    <div class="output">
+        {% if Message|length > 0 %}
+        <div class="alert alert-danger alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Error!</strong>
+            {{ Message }}
+        </div>
+        {% endif %}
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="username" class="form-control" name="username"/>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" name="password"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+</div>
+{% endblock content %}
