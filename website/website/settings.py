@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'apps',
-	'martor'
+    'apps',
+    'martor'
 ]
 
 MIDDLEWARE = [
@@ -127,11 +127,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MARTOR_ENABLE_CONFIGS = {
-	'imgur' : 'true',
-	'mention' : 'false',
-	'jquery' : 'true',
-	'living' : 'false',
-	'spellcheck' : 'false'
+    'imgur' : 'true',
+    'mention' : 'false',
+    'jquery' : 'true',
+    'living' : 'false',
+    'spellcheck' : 'false'
 }
 
 MARTOR_ENABLE_LABEL = True
@@ -146,13 +146,13 @@ MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/'
 
 # Markdown extensions (default)
 MARTOR_MARKDOWN_EXTENSIONS = [
-	'markdown.extensions.extra',
-	'markdown.extensions.nl2br',
-	'markdown.extensions.smarty',
-	'markdown.extensions.fenced_code',
-	'martor.extensions.urlize',
-	'martor.extensions.del_ins',
-	'martor.extensions.mdx_video'
+    'markdown.extensions.extra',
+    'markdown.extensions.nl2br',
+    'markdown.extensions.smarty',
+    'markdown.extensions.fenced_code',
+    'martor.extensions.urlize',
+    'martor.extensions.del_ins',
+    'martor.extensions.mdx_video'
 ]
 
 # Markdown Extensions Configs
