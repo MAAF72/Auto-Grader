@@ -2,24 +2,75 @@
 Script for auto grading submission
 """
 from time import time, sleep
-from os import remove, path
+from os import remove, path, name as os_name
 from subprocess import TimeoutExpired, CalledProcessError, SubprocessError, run, PIPE
 import sqlite3
-import resource
+import re
+
+if os_name != 'nt':
+    import limit
+
+def cmdline_split(s, platform='this'):
+    """Multi-platform variant of shlex.split() for command-line splitting.
+    For use with subprocess, for argv injection etc. Using fast REGEX.
+
+    platform: 'this' = auto from current platform;
+              1 = POSIX; 
+              0 = Windows/CMD
+              (other values reserved)
+    """
+    if platform == 'this':
+        platform = (os_name != 'nt')
+    if platform == 1:
+        RE_CMD_LEX = r'''"((?:\\["\\]|[^"])*)"|'([^']*)'|(\\.)|(&&?|\|\|?|\d?\>|[<])|([^\s'"\\&|<>]+)|(\s+)|(.)'''
+    elif platform == 0:
+        RE_CMD_LEX = r'''"((?:""|\\["\\]|[^"])*)"?()|(\\\\(?=\\*")|\\")|(&&?|\|\|?|\d?>|[<])|([^\s"&|<>]+)|(\s+)|(.)'''
+    else:
+        raise AssertionError('unkown platform %r' % platform)
+
+    args = []
+    accu = None   # collects pieces of one arg
+    for qs, qss, esc, pipe, word, white, fail in re.findall(RE_CMD_LEX, s):
+        if word:
+            pass   # most frequent
+        elif esc:
+            word = esc[1]
+        elif white or pipe:
+            if accu is not None:
+                args.append(accu)
+            if pipe:
+                args.append(pipe)
+            accu = None
+            continue
+        elif fail:
+            raise ValueError("invalid or incomplete shell string")
+        elif qs:
+            word = qs.replace('\\"', '"').replace('\\\\', '\\')
+            if platform == 0:
+                word = word.replace('""', '"')
+        else:
+            word = qss   # may be even empty; must be last
+
+        accu = (accu or '') + word
+
+    if accu is not None:
+        args.append(accu)
+
+    return args
 
 def delete_file(file):
     """
     Delete the file if exist
     """
-    for i in range(10):
+    for _ in range(10):
         try:
             if path.isfile(file):
                 remove(file)
-        except:
-            print("Delete failed, retrying...")
+        except Exception as error:
+            sleep(5)
+            print("Delete failed, retrying...", error)
         else:
             break
-        
 
 def compare_file(file1, file2):
     """
@@ -60,12 +111,11 @@ def compile_file(file_name, language):
     if command:
         try:
             process = run(
-                command,
+                cmdline_split(command),
                 stdin=None,
                 stdout=None,
                 stderr=PIPE,
-                check=True,
-                shell=True
+                shell=False
             )
 
             if process.returncode == 0:
@@ -75,10 +125,13 @@ def compile_file(file_name, language):
 
         except CalledProcessError as cpe:
             if cpe.returncode == 3:
-                return 'ACE', cpe, 0.00
-            return 'UNE', cpe, 0.00
+                return 'ACE', cpe
+            return 'UNE', cpe
         except SubprocessError as spe:
             return 'UNE', spe
+
+        except Exception as error:
+            print(error)
 
     return 'CTE', 'The language is not allowed'
 
@@ -90,31 +143,54 @@ def run_test_case(args):
         with open(args['INPUT_FILE'], 'r') as fin, open(args['OUTPUT_FILE'], 'w') as fout:
             command = path.join('Temp-Program', '{}.judge'.format(args['FILE_NAME']))
             start_time = time()
-            process = run(
-                command,
-                stdin=fin,
-                stdout=fout,
-                stderr=PIPE,
-                timeout=args['TIMEOUT'],
-                check=True,
-                shell=True
-            )
-            print(process.stderr)
+            process = None
+            if os_name != 'nt':
+                limit.change_max_virtual_memory(256 * 1024 * 1024)
+                process = run(
+                    cmdline_split(command),
+                    stdin=fin,
+                    stdout=fout,
+                    stderr=PIPE,
+                    timeout=args['TIMEOUT'],
+                    preexec_fn=limit.limit_virtual_memory
+                )
+            else:
+                process = run(
+                    cmdline_split(command),
+                    stdin=fin,
+                    stdout=fout,
+                    stderr=PIPE,
+                    timeout=args['TIMEOUT']
+                )
+
             run_time = round((time() - start_time), 2)
 
             if process.returncode == 0:
                 return 'Success', None, run_time
-
-            return 'RTE', process.stderr, run_time
+            #2 = Pola Aneh make 100000000 array in golang Linux
+            #-6 = Kodingan Restaurant.cpp dimasukin ke Pola Aneh Linux
+            #3 = Kodingan Restaurant.cpp dimasukin ke Pola Aneh Windows || std::bad_array_new_length
+            #print("process", process)
+            #print("process args", process.args)
+            #print("process returncode", process.returncode)
+            #print("process stderr", process.stderr)
+            return 'RTE', process.returncode, run_time
 
     except TimeoutExpired as tle:
         return 'TLE', tle, 2.00
     except CalledProcessError as cpe:
+        print("CPE, returncode:", cpe.returncode)
         if cpe.returncode == 3:
             return 'ACE', cpe, 0.00
+        elif cpe.returncode == -11:
+            return 'MLE', cpe, 0.00
         return 'UNE', cpe, 0.00
     except SubprocessError as spe:
+        print("SPE, returncode:", spe.returncode)
         return 'UNE', spe, 0.00
+
+    except Exception as error:
+        print(error)
 
 def judge(args):
     """
@@ -236,14 +312,13 @@ def grade(cursor, host):
 
                 #Make sure program file, input_file, and key are present
                 test_case = get_test_case(cursor, i[1])
-
                 print('Judging SubmissionID: {}'.format(i[0]))
                 score, status = judge(
                     {
                         'TEST_CASE' : test_case,
                         'FILE_NAME' : i[2],
                         'LANGUAGE' : i[3],
-                        'TIMEOUT' : i[4],
+                        'TIMEOUT' : i[4]
                     }
                 )
                 if status:
@@ -270,6 +345,8 @@ except sqlite3.Error as error:
     print('Error while connecting to database', error)
 except KeyboardInterrupt:
     pass
+except Exception as error:
+    print(error)
 else:
     if DB_CON.is_connected():
         DB_CON.cursor().close()

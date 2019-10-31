@@ -42,6 +42,7 @@ class Submission(models.Model):
         ('RTE', 'Runtime Error'),
         ('CTE', 'Compilation Error'),
         ('ACE', 'Abort Called Error'),
+        ('MLE', 'Memory Limit Exceeded'),
         ('UNE', 'Unknown Error')
     }
 
