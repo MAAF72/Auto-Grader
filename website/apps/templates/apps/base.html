@@ -9,19 +9,19 @@
 		{% block extra-css %}
 		{% endblock extra-css %}
 	</head>
-	<body class="bg-light">
+	<body class="bg-light"> 
 		<nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light pl-5 pr-5">
 			<a class="navbar-brand" href="{% url 'apps:index' %}">
-                ULTRAG
+                <strong>ULTRAG</strong>
 			</a>
 			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active">
+				<li class="nav-item{% if request.resolver_match.url_name == 'index' %} active{% endif %}">
 					<a class="nav-link" href="{% url 'apps:index' %}">Home</a>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item{% if request.resolver_match.url_name == 'problems' %} active{% endif %}">
 					<a class="nav-link" href="{% url 'apps:problems' %}">Problems</a>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item{% if request.resolver_match.url_name == 'submissions' %} active{% endif %}">
 					<a class="nav-link" href="{% url 'apps:submissions' %}">Submissions</a>
 				</li>
 			</ul>

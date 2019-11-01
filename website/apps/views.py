@@ -1,6 +1,5 @@
 import uuid
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth as auth
 from django.db.models import Q, Sum, Max
@@ -28,14 +27,14 @@ def login(request):
     }
 
     if request.user.is_authenticated:
-        return HttpResponseRedirect('../')
+        return redirect('apps:index')
     elif request.method == 'POST':
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
         user = auth.authenticate(request, username=username, password=password)
         if user:
             auth.login(request, user)
-            return HttpResponseRedirect('../')
+            return redirect('apps:index')
         else:
             context['Message'] = 'Wrong Credential!'
 
@@ -48,7 +47,7 @@ def register(request):
     }
 
     if request.user.is_authenticated:
-        return HttpResponseRedirect('../')
+        return redirect('apps:index')
     elif request.method == 'POST':
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
@@ -59,7 +58,7 @@ def register(request):
             user = auth.authenticate(request, username=username, password=password)
             auth.login(request, user)
 
-            return HttpResponseRedirect('../')
+            return redirect('apps:index')
         else:
             context['Message'] = 'Username or Email Has Already Been Taken!'
 
@@ -67,7 +66,7 @@ def register(request):
 
 def logout(request):
     auth.logout(request)
-    return HttpResponseRedirect('../')
+    return redirect('apps:index')
 
 def profile(request, username):
     user = User.objects.get(username=username)
@@ -83,7 +82,7 @@ def profile(request, username):
     return render(request, 'apps/profile.html', context)
 
 def submissions(request):
-    submissions = models.Submission.objects.all()
+    submissions = models.Submission.objects.all().order_by('-date')
 
     context = {
         'Title': 'ULTRAG - Submission List',
@@ -94,7 +93,7 @@ def submissions(request):
 
 @login_required(login_url='/login')
 def submissions_my(request):
-    submissions = models.Submission.objects.filter(user=request.user)
+    submissions = models.Submission.objects.filter(user=request.user).order_by('-date')
 
     context = {
         'Title': 'ULTRAG - My Submissions',
@@ -160,9 +159,9 @@ def problem(request, id):
                         file.write(chunk)
                 submission = models.Submission.objects.create(user=request.user, name=name, problem=models.Problem.objects.get(id=id), language=LANGUAGE[extension], host=0)
                 submission.save()
-                return HttpResponseRedirect('../submission/{}'.format(submission.id))
-            return HttpResponseRedirect('') #Extension not allowed
-        return HttpResponseRedirect('') #File Size Limit Exceeded
+                return redirect('apps:submission', submission.id)
+            return redirect('') #Extension not allowed
+        return redirect('') #File Size Limit Exceeded
 
     else:
         problem = models.Problem.objects.get(id=id)

@@ -31,7 +31,7 @@
 	<tbody>
 		{% for submission in Submissions %}
 		<tr>
-			<th scope="row">{{ submission.id }}</th>
+			<th scope="row">{{ forloop.counter }}</th>
 			<td><a href="{% url 'apps:profile' submission.user.username %}">{{ submission.user.username }}</a></td>
 			<td><a href="{% url 'apps:problem' submission.problem_id %}">{{ submission.problem }}</a></td>
 			<td>{{ submission.language }}</td>
