@@ -1,0 +1,71 @@
+{% extends 'apps/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra-css %}
+
+{% endblock extra-css %}
+
+{% block extra-js %}
+{% endblock extra-js %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="POST" class="post-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Problem Name</label>
+        <div class="col-sm-12">
+            {{ form.name|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Problem Statement</label>
+        <div class="col-sm-12">
+            {{ form.description|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Input Format</label>
+        <div class="col-sm-12">
+            {{ form.input_format|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Output Format</label>
+        <div class="col-sm-12">
+            {{ form.output_format|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Constraints</label>
+        <div class="col-sm-12">
+            {{ form.constraints|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Time Limit(S)</label>
+        <div class="col-sm-12">
+            {{ form.time_limit|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Memory Limit(MB)</label>
+        <div class="col-sm-12">
+            {{ form.memory_limit|add_class:"form-control" }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary">{{ button }}</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends 'apps/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra-css %}
+
+{% endblock extra-css %}
+
+{% block extra-js %}
+{% endblock extra-js %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="POST" class="post-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-5 col-form-label">Problem Name : <b>{{ problem_name }}</b></label>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Test Case Name</label>
+        <div class="col-sm-12">
+            {{ form.name|add_class:'form-control' }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Input</label>
+        <div class="col-sm-12">
+            <textarea name="input_content" cols="40" rows="10" class="form-control" required id="id_input_content">{{ input_content }}</textarea>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Output</label>
+        <div class="col-sm-12">
+            <textarea name="output_content" cols="40" rows="10" class="form-control" required id="id_output_content">{{ output_content }}</textarea>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Sample</label>
+        <div class="col-sm-12">
+            {{ form.sample|add_class:'form-control' }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 col-form-label">Explanation</label>
+        <div class="col-sm-12">
+            {{ form.explanation|add_class:'form-control' }}
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary">{{ button }}</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}

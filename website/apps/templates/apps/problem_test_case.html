@@ -1,0 +1,49 @@
+{% extends 'apps/base.html' %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+{% endblock extra-css %}
+
+{% block extra-js %}
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script>
+	$(document).ready(function() {
+		$('#test_cases').DataTable();
+	} );
+</script>
+{% endblock extra-js %}
+
+{% block content %}
+
+<div class="row justify-content-end">
+    
+    <div class="col-9">
+        <h2>Manage {{ problem_name }}'s Test Cases</h2>
+    </div>
+    <div class="col-3" style="padding-left: 8.34rem">
+       <a class="btn btn-primary" href="{% url 'apps:test_case_create' problem_id  %}" role="button">Add Test Case</a>
+    </div>
+</div>
+
+<table id="test_cases" class="table table-hover">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Name</th>
+			<th scope="col">Sample</th>
+			<th scope="col">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for tc in test_cases %}
+		<tr>
+			<th scope="row">{{ forloop.counter }}</th>
+			<td><a href="{% url 'apps:problem' tc.id %}">{{ tc.name }}</a></td>
+			<td>{{ tc.sample }}</td>
+            <td><a href="{% url 'apps:test_case_edit' tc.id %}">Edit</a> | <a href="{% url 'apps:test_case_delete' tc.id %}">Delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock content %}
